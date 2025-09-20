@@ -15,8 +15,8 @@ clap = { version = "4.5.47", features = ["derive"] }
 config = { version = "0.15.16", features = ["json"] }
 derive_builder = "0.20.2"
 eframe = "0.32.3"
+egui_extras = "0.32.3"
 egui_flex = "0.4.0"
-egui_table = "0.4.0"
 futures = "0.3.31"
 gethostname = "1.0.2"
 java-properties = "2.0.0"
