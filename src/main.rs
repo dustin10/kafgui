@@ -1,5 +1,5 @@
 use chrono::{DateTime, Local};
-use eframe::egui::{self, Button};
+use eframe::egui;
 use egui_extras::Column;
 use std::collections::HashMap;
 
@@ -26,112 +26,135 @@ fn main() -> eframe::Result {
             egui_flex::Flex::horizontal()
                 .w_full()
                 .h_full()
+                .align_items_content(egui::Align2::LEFT_TOP)
                 .show(ui, |flex| {
-                    flex.add_ui(
-                        egui_flex::item()
-                            .align_self_content(egui::Align2::LEFT_TOP)
-                            .grow(0.4),
-                        |ui| {
-                            egui_extras::TableBuilder::new(ui)
-                                .id_salt("record-list")
-                                .column(Column::auto())
-                                .column(Column::auto())
-                                .column(Column::auto())
-                                .column(Column::auto())
-                                .header(20.0, |mut hdr| {
-                                    hdr.col(|ui| {
-                                        let _ = ui.heading("Partition");
+                    flex.add_ui(egui_flex::item().grow(0.5), |ui| {
+                        egui_extras::TableBuilder::new(ui)
+                            .id_salt("record-list")
+                            .column(Column::auto())
+                            .column(Column::auto())
+                            .column(Column::auto())
+                            .column(Column::auto())
+                            //.header(20.0, |mut hdr| {
+                            //    hdr.col(|ui| {
+                            //        let _ = ui.heading("Partition");
+                            //    });
+                            //    hdr.col(|ui| {
+                            //        let _ = ui.heading("Offset");
+                            //    });
+                            //    hdr.col(|ui| {
+                            //        let _ = ui.heading("Key");
+                            //    });
+                            //    hdr.col(|ui| {
+                            //        let _ = ui.heading("Timestamp");
+                            //    });
+                            //})
+                            .body(|body| {
+                                body.rows(20.0, app.records.len(), |mut row| {
+                                    let record = app
+                                        .records
+                                        .get(row.index())
+                                        .expect("record exists for row");
+
+                                    row.col(|ui| {
+                                        let _ = ui.label(record.partition.to_string());
                                     });
-                                    hdr.col(|ui| {
-                                        let _ = ui.heading("Offset");
+                                    row.col(|ui| {
+                                        let _ = ui.label(record.offset.to_string());
                                     });
-                                    hdr.col(|ui| {
-                                        let _ = ui.heading("Key");
+                                    row.col(|ui| {
+                                        let _ = ui.label(record.key.clone().unwrap_or_default());
                                     });
-                                    hdr.col(|ui| {
-                                        let _ = ui.heading("Timestamp");
+                                    row.col(|ui| {
+                                        let _ = ui.label(record.timestamp.to_string());
                                     });
                                 })
-                                .body(|body| {
-                                    body.rows(20.0, app.records.len(), |mut row| {
-                                        let record = app
-                                            .records
-                                            .get(row.index())
-                                            .expect("record exists for row");
+                            });
+                    });
 
-                                        row.col(|ui| {
-                                            let _ = ui.label(record.partition.to_string());
+                    flex.add_ui(egui_flex::item().grow(0.5), |ui| {
+                        egui_flex::Flex::vertical()
+                            //.w_full()
+                            .h_full()
+                            .align_items_content(egui::Align2::LEFT_TOP)
+                            .show(ui, |flex| {
+                                flex.add_ui(egui_flex::item().grow(0.1), |ui| {
+                                    egui_extras::TableBuilder::new(ui)
+                                        .id_salt("record-info")
+                                        .column(Column::auto())
+                                        .column(Column::auto())
+                                        //.header(20.0, |mut hdr| {
+                                        //    hdr.col(|ui| {
+                                        //        let _ = ui.heading("Info");
+                                        //    });
+                                        //})
+                                        .body(|body| {
+                                            body.rows(20.0, 4, |mut row| match row.index() {
+                                                0 => {
+                                                    row.col(|ui| {
+                                                        let _ = ui.label("Topic:");
+                                                    });
+                                                    row.col(|ui| {
+                                                        let _ = ui.label("users");
+                                                    });
+                                                }
+                                                1 => {
+                                                    row.col(|ui| {
+                                                        let _ = ui.label("Partition:");
+                                                    });
+                                                    row.col(|ui| {
+                                                        let _ = ui.label("0");
+                                                    });
+                                                }
+                                                2 => {
+                                                    row.col(|ui| {
+                                                        let _ = ui.label("Offset:");
+                                                    });
+                                                    row.col(|ui| {
+                                                        let _ = ui.label("0");
+                                                    });
+                                                }
+                                                3 => {
+                                                    row.col(|ui| {
+                                                        let _ = ui.label("Timestamp:");
+                                                    });
+                                                    row.col(|ui| {
+                                                        let _ = ui.label(Local::now().to_string());
+                                                    });
+                                                }
+                                                _ => {
+                                                    panic!("unexpected record info row")
+                                                }
+                                            })
                                         });
-                                        row.col(|ui| {
-                                            let _ = ui.label(record.offset.to_string());
-                                        });
-                                        row.col(|ui| {
-                                            let _ =
-                                                ui.label(record.key.clone().unwrap_or_default());
-                                        });
-                                        row.col(|ui| {
-                                            let _ = ui.label(record.timestamp.to_string());
-                                        });
-                                    })
                                 });
-                        },
-                    );
-
-                    flex.add_ui(
-                        egui_flex::item()
-                            .align_self_content(egui::Align2::LEFT_TOP)
-                            .grow(0.4),
-                        |ui| {
-                            egui_extras::TableBuilder::new(ui)
-                                .id_salt("record-info")
-                                .column(Column::auto())
-                                .column(Column::auto())
-                                .column(Column::auto())
-                                .column(Column::auto())
-                                .header(20.0, |mut hdr| {
-                                    hdr.col(|ui| {
-                                        let _ = ui.heading("Info");
-                                    });
-                                })
-                                .body(|body| {
-                                    body.rows(20.0, 4, |mut row| match row.index() {
-                                        0 => {
-                                            row.col(|ui| {
-                                                let _ = ui.label("Topic:");
-                                            });
-                                            row.col(|ui| {
-                                                let _ = ui.label("users");
-                                            });
-                                        }
-                                        1 => {
-                                            row.col(|ui| {
-                                                let _ = ui.label("Partition:");
-                                            });
-                                            row.col(|ui| {
-                                                let _ = ui.label("0");
-                                            });
-                                        }
-                                        2 => {
-                                            row.col(|ui| {
-                                                let _ = ui.label("Offset:");
-                                            });
-                                            row.col(|ui| {
-                                                let _ = ui.label("0");
-                                            });
-                                        }
-                                        3 => {
-                                            row.col(|ui| {
-                                                let _ = ui.label("Timestamp:");
-                                            });
-                                            row.col(|ui| {
-                                                let _ = ui.label(Local::now().to_string());
-                                            });
-                                        }
-                                        _ => panic!("unexpected record info row"),
-                                    })
+                                flex.add_ui(egui_flex::item().grow(0.2), |ui| {
+                                    egui_extras::TableBuilder::new(ui)
+                                        .id_salt("record-headers")
+                                        .column(Column::auto())
+                                        .column(Column::auto())
+                                        //.header(20.0, |mut hdr| {
+                                        //    hdr.col(|ui| {
+                                        //        let _ = ui.heading("Info");
+                                        //    });
+                                        //})
+                                        .body(|body| {
+                                            body.rows(20.0, 1, |mut row| {
+                                                row.col(|ui| {
+                                                    let _ = ui.label("foo");
+                                                });
+                                                row.col(|ui| {
+                                                    let _ = ui.label("bar");
+                                                });
+                                            })
+                                        });
                                 });
-                        },
-                    );
+                                flex.add_ui(egui_flex::item().grow(0.7), |ui| {
+                                    let mut text = String::from("{}");
+                                    ui.text_edit_multiline(&mut text);
+                                });
+                            });
+                    });
                 });
         });
     })
