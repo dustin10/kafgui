@@ -192,7 +192,10 @@ fn main() -> eframe::Result {
                         tui.ui(|ui| {
                             let record = state.records.first().expect("record exists");
                             let mut value = record.value.clone().unwrap_or_default();
-                            ui.text_edit_multiline(&mut value);
+                            ui.add_sized(
+                                ui.available_size(),
+                                egui::TextEdit::multiline(&mut value).code_editor(),
+                            );
                         });
                     });
                 });
